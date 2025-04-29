@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -108,13 +69,14 @@
 
     const PLANET_RESOURCES = [
       '', // Empty option for no selection
-      'Ferrite Dust', 'Pure Ferrite', 'Magnetised Ferrite', 'Oxygen', 'Sodium', 'Sodium Nitrate',
-      'Carbon', 'Condensed Carbon', 'Di-hydrogen', 'Cobalt', 'Salt', 'Chlorine',
-      'Star Bulb', 'Cactus Flesh', 'Gamma Root', 'Fungal Mould', 'Frost Crystal', 'Solanium',
-      'Copper', 'Cadmium', 'Emeril', 'Indium', 'Paraffinium', 'Pyrite', 'Ammonia',
-      'Uranium', 'Dioxite', 'Phosphorus', 'Activated Copper', 'Activated Cadmium',
-      'Activated Emeril', 'Activated Indium', 'TetraCobalt', 'Storm Crystals',
-      'Gold', 'Silver', 'Platinum', 'Marrow Bulb', 'Kelp Sac', 'Crystal Sulphide'
+      'Activated Cadmium', 'Activated Copper', 'Activated Emeril', 'Activated Indium',
+      'Ammonia', 'Ancient Bones', 'Cactus Flesh', 'Carbon', 'Chlorine', 'Cobalt',
+      'Condensed Carbon', 'Copper', 'Crystal Sulphide', 'Di-hydrogen', 'Dioxite',
+      'Emeril', 'Ferrite Dust', 'Frost Crystal', 'Fungal Mould', 'Gamma Root',
+      'Gold', 'Indium', 'Kelp Sac', 'Magnetised Ferrite', 'Marrow Bulb', 'Oxygen',
+      'Paraffinium', 'Phosphorus', 'Platinum', 'Pure Ferrite', 'Pyrite', 'Salt',
+      'Silver', 'Sodium', 'Sodium Nitrate', 'Solanium', 'Star Bulb', 'Storm Crystals',
+      'TetraCobalt', 'Uranium'
     ];
 
     const App = () => {
